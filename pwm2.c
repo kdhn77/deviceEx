@@ -12,7 +12,7 @@
 #define PARAM_M90		258
 #define PARAM_0			358
 #define PARAM_P90		458
-#define PARAM_STEP  1
+#define PARAM_STEP  10
 
 #define ANGLE_M90		0
 #define ANGLE_0			1
@@ -26,6 +26,16 @@
 #define LED0_ON_H			0x07
 #define LED0_OFF_L		0x08
 #define LED0_OFF_H		0x09
+
+#define LED4_ON_L			0x16
+#define LED4_ON_H			0x17
+#define LED4_OFF_L		0x18
+#define LED4_OFF_H		0x19
+#define LED5_ON_L			0x1A
+#define LED5_ON_H			0x1B
+#define LED5_OFF_L		0x1C
+#define LED5_OFF_H		0x1D
+
 
 #define LED1_ON_L			0x0A
 #define LED1_ON_H			0x0B
@@ -108,7 +118,7 @@ int pca9685_restart(void)
 	int length;
 	
 	reg_write8(MODE1, 0x00);
-	reg_write8(MODE2, 0x00);
+	reg_write8(MODE2, 0x04);
 	return 0;
 }
 
@@ -121,7 +131,7 @@ int pca9685_freq()
 	reg_write8(MODE1, 0x10);				// OP : OSC OFF
 	reg_write8(PRE_SCALE, pre_val);	// OP : WRITE PRE_SCALE VALUE
 	reg_write8(MODE1, 0x80);				// OP : RESTART
-	reg_write8(MODE2, 0x00);				// OP : TOTEM POLE 
+	reg_write8(MODE2, 0x04);				// OP : TOTEM POLE 
 	return 0;
 }
 
@@ -314,6 +324,28 @@ int testServo2(void)
 	}
 	return 0;	
 }
+
+int test_rearwheel()
+{
+  int i;
+  unsigned short value=2048;
+    while(1)
+    {
+      printf("value : %d\n",value);
+      reg_write16(LED4_ON_L, 0);
+      reg_read16(LED4_ON_L);
+      reg_write16(LED4_OFF_L, value);
+      reg_read16(LED4_OFF_L);
+      reg_write16(LED5_ON_L, 0);
+      reg_read16(LED5_ON_L);
+      reg_write16(LED5_OFF_L, value);
+      reg_read16(LED5_OFF_L);
+      value++;
+      if(value>=4095)
+        break;
+    }
+  return 0;
+}
 			
 int main(void)
 {
@@ -350,7 +382,9 @@ int main(void)
 	}
  */
 	
-  testServo2();
+  //testServo2();
+  
+  test_rearwheel();
 	servoOFF();
 
 	return 0;
